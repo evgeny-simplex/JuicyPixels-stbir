@@ -5,7 +5,7 @@ license:              BSD3
 license-file:         LICENSE
 author:               Jorge L Rodriguez, Michael Tolly
 maintainer:           miketolly@gmail.com
-copyright:            Jorge L Rodriguez, Michael Tolly
+copyright:            Jorge L Rodriguez, Michael Tolly, 2026 SimpleX Chat Ltd
 category:             Graphics, Image
 build-type:           Simple
 extra-source-files:
