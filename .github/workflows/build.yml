@@ -1,0 +1,50 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: ${{ matrix.os }}, GHC ${{ matrix.ghc }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            ghc: 9.6.3
+          - os: ubuntu-22.04
+            ghc: 8.10.7
+          - os: macos-latest
+            ghc: 9.6.3
+          - os: windows-latest
+            ghc: 9.6.3
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Point Command Line Tools SDK to Xcode SDK
+        if: runner.os == 'macOS'
+        run: sudo ln -sfn "$(xcrun --sdk macosx --show-sdk-path)" /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+
+      - id: setup
+        uses: simplex-chat/setup-haskell-action@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: 3.10.2.0
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.setup.outputs.cabal-store }}
+          key: store-${{ matrix.os }}-ghc${{ matrix.ghc }}-${{ hashFiles('*.cabal') }}
+          restore-keys: store-${{ matrix.os }}-ghc${{ matrix.ghc }}-
+
+      - run: cabal build --enable-tests all
+
+      - run: cabal test --enable-tests --test-show-details=direct all
