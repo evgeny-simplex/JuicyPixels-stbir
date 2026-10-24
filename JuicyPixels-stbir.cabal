@@ -29,6 +29,14 @@ library
   include-dirs:
     cbits/stb/
 
+test-suite scale-test
+  type:                 exitcode-stdio-1.0
+  hs-source-dirs:       test
+  main-is:              ScaleTest.hs
+  build-depends:        base, JuicyPixels, JuicyPixels-stbir, vector
+  default-language:     Haskell2010
+  ghc-options:          -Wall
+
 source-repository head
   type:     git
   location: https://github.com/mtolly/JuicyPixels-stbir
