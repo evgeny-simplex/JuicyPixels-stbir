@@ -20,6 +20,8 @@ jobs:
             ghc: 9.6.3
           - os: ubuntu-22.04
             ghc: 8.10.7
+          - os: ubuntu-22.04-arm
+            ghc: 9.6.3
           - os: macos-latest
             ghc: 9.6.3
           - os: windows-latest

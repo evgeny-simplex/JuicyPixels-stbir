@@ -6,15 +6,17 @@ module Main (main) where
 import Codec.Picture (Image (..), Pixel (..), PixelRGB8 (..), PixelRGBA8 (..), generateImage)
 import qualified Codec.Picture.STBIR as STBIR
 import Control.Monad (unless)
+import Data.Bits (xor)
 import Data.Ratio ((%))
 import qualified Data.Vector.Storable as V
+import Data.Word (Word64)
 import System.Exit (exitFailure)
 
 type Cases = forall a. STBIR.STBIRPixel a => String -> Image a -> [String]
 
 main :: IO ()
 main = do
-  let failures = concatMap (sizeCases halvingCases) halvingSizes ++ concatMap (sizeCases fractionalCases) fractionalSizes
+  let failures = concatMap (sizeCases halvingCases) halvingSizes ++ concatMap (sizeCases fractionalCases) fractionalSizes ++ pinnedCatmullRom
   mapM_ putStrLn failures
   unless (null failures) exitFailure
 
@@ -44,6 +46,14 @@ check name img scale = [failure | actual /= (w, h, w * h * componentCount (undef
     h = expected imageHeight
     expected f = round $ fromIntegral (f img) / scale
     failure = name <> " " <> show (imageWidth img, imageHeight img) <> " / " <> show scale <> ": " <> show actual
+
+pinnedCatmullRom :: [String]
+pinnedCatmullRom = [failure | actual /= 14333637002857317752]
+  where
+    out = STBIR.resize options 320 240 (gradientRGB (1001, 999))
+    options = STBIR.defaultOptions {STBIR.filterHorizontal = STBIR.FILTER_CATMULLROM, STBIR.filterVertical = STBIR.FILTER_CATMULLROM}
+    actual = V.foldl' (\h b -> (h `xor` fromIntegral b) * 1099511628211) (14695981039346656037 :: Word64) (imageData out)
+    failure = "catmull-rom rgb (1001,999) -> (320,240): " <> show actual
 
 downscale :: STBIR.STBIRPixel a => Image a -> Float -> Image a
 downscale img scale = STBIR.resize STBIR.defaultOptions (scaled imageWidth) (scaled imageHeight) img
