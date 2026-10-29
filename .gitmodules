@@ -1,0 +1,3 @@
+[submodule "cbits/stb"]
+	path = cbits/stb
+	url = https://github.com/nothings/stb.git

@@ -1,17 +1,17 @@
+cabal-version:        2.2
 name:                 JuicyPixels-stbir
 version:              0.1.0.0
 homepage:             https://github.com/mtolly/JuicyPixels-stbir
-license:              BSD3
+license:              BSD-3-Clause AND (MIT OR Unlicense)
 license-file:         LICENSE
 author:               Jorge L Rodriguez, Michael Tolly
 maintainer:           miketolly@gmail.com
-copyright:            Jorge L Rodriguez, Michael Tolly
+copyright:            Jorge L Rodriguez, Michael Tolly, 2026 SimpleX Chat Ltd
 category:             Graphics, Image
 build-type:           Simple
 extra-source-files:
   README.md
-  cbits/stb_image_resize.h
-cabal-version:        >= 1.10
+  cbits/stb/stb_image_resize.h
 synopsis:             Scale JuicyPixels images with stb_image_resize
 description:
   Use the <https://github.com/nothings/stb stb> image resize C library
@@ -21,13 +21,22 @@ library
   hs-source-dirs:       src
   exposed-modules:      Codec.Picture.STBIR
   build-depends:        base >= 4.7 && < 5, JuicyPixels, vector, data-default-class
-  build-tools:          c2hs
+  build-tool-depends:   c2hs:c2hs
   default-language:     Haskell2010
   ghc-options:          -Wall
+  cc-options:           -ffp-contract=off
   c-sources:
     cbits/stb_image_resize.c
   include-dirs:
-    cbits/
+    cbits/stb/
+
+test-suite scale-test
+  type:                 exitcode-stdio-1.0
+  hs-source-dirs:       test
+  main-is:              ScaleTest.hs
+  build-depends:        base, JuicyPixels, JuicyPixels-stbir, vector
+  default-language:     Haskell2010
+  ghc-options:          -Wall
 
 source-repository head
   type:     git
